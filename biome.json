@@ -1,0 +1,28 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
+  "files": {
+    "includes": [
+      "app/**/*.css",
+      "app/**/*.ts",
+      "app/**/*.tsx",
+      "auth.ts",
+      "biome.json",
+      "next.config.ts",
+      "package.json",
+      "prisma.config.ts",
+      "tsconfig.json",
+      "!app/generated"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  }
+}

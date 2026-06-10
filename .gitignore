@@ -1,0 +1,18 @@
+.next/
+node_modules/
+out/
+
+.env
+.env*
+!.env.example
+
+*.log
+.DS_Store
+
+app/generated/prisma/
+
+/app/generated/prisma
+
+# Static HTML files
+*.html
+

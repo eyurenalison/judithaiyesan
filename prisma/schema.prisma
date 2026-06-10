@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model SiteSettings {
+  id             String   @id @default(cuid())
+  siteName       String   @default("Judith Aiyesan")
+  logoSrc        String   @default("/images/core-img/logoj.png")
+  faviconSrc     String   @default("/images/core-img/favicon.png")
+  contactEmail   String   @default("info@judithaiyesan.com")
+  contactPhone   String   @default("+234 816 752 9122")
+  contactAddress String   @default("Plot 5, Sani Abacha Road GRA Phase 3, Port Harcourt.")
+  facebookUrl    String?
+  instagramUrl   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model HeroSlide {
+  id          String   @id @default(cuid())
+  title       String
+  subtitle    String?
+  imageSrc    String
+  buttonLabel String?
+  buttonUrl   String?
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Album {
+  id                String   @id @default(cuid())
+  title             String
+  subtitle          String?
+  coverImageSrc     String
+  audioFileSrc      String?
+  externalListenUrl String?
+  downloadFileSrc   String?
+  featured          Boolean  @default(false)
+  order             Int      @default(0)
+  published         Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Lyric {
+  id        String   @id @default(cuid())
+  songTitle String
+  body      String
+  summary   String?
+  coverSrc  String?
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id            String        @id @default(cuid())
+  title         String
+  date          DateTime
+  displayDate   String
+  location      String
+  description   String
+  coverImageSrc String
+  status        String
+  published     Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  galleryItems  GalleryItem[]
+}
+
+model Media {
+  id           String        @id @default(cuid())
+  type         String
+  url          String
+  altText      String?
+  filename     String?
+  mimeType     String?
+  sizeBytes    Int?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  galleryItems GalleryItem[]
+}
+
+model GalleryItem {
+  id        String   @id @default(cuid())
+  eventId   String
+  mediaId   String
+  caption   String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, mediaId])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

@@ -1,0 +1,34 @@
+import type { Metadata } from "next";
+import "./globals.css";
+import { Footer } from "./components/footer";
+import { Header } from "./components/header";
+import { getSiteSettings } from "./lib/content";
+
+export const metadata: Metadata = {
+  title: "Judith Aiyesan | Music Artiste",
+  description:
+    "Official website for Judith Aiyesan, featuring music, lyrics, events, and contact information.",
+  icons: {
+    icon: "/images/core-img/logoj.png",
+    shortcut: "/images/core-img/logoj.png",
+    apple: "/images/core-img/logoj.png",
+  },
+};
+
+export default async function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const settings = await getSiteSettings();
+
+  return (
+    <html lang="en">
+      <body>
+        <Header settings={settings} />
+        <main>{children}</main>
+        <Footer settings={settings} />
+      </body>
+    </html>
+  );
+}

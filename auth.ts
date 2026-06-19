@@ -1,20 +1,7 @@
 import bcrypt from "bcryptjs";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-
-function getAdminEmail() {
-  return process.env.ADMIN_EMAIL?.trim().toLowerCase();
-}
-
-async function isValidAdminPassword(password: string) {
-  const passwordHash = process.env.ADMIN_PASSWORD_HASH;
-
-  if (!passwordHash) {
-    return false;
-  }
-
-  return bcrypt.compare(password, passwordHash);
-}
+import { getPrisma } from "./app/lib/db";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
@@ -27,7 +14,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const adminEmail = getAdminEmail();
         const email =
           typeof credentials?.email === "string"
             ? credentials.email.trim().toLowerCase()
@@ -35,20 +21,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password =
           typeof credentials?.password === "string" ? credentials.password : "";
 
-        if (!adminEmail || email !== adminEmail || !password) {
+        if (!email || !password) {
           return null;
         }
 
-        const isValidPassword = await isValidAdminPassword(password);
+        const adminUser = await getPrisma().adminUser.findUnique({
+          where: { email },
+        });
+
+        if (!adminUser?.active) {
+          return null;
+        }
+
+        const isValidPassword = await bcrypt.compare(
+          password,
+          adminUser.passwordHash,
+        );
 
         if (!isValidPassword) {
           return null;
         }
 
         return {
-          id: "admin",
-          email: adminEmail,
-          name: "Administrator",
+          id: adminUser.id,
+          email: adminUser.email,
+          name: adminUser.name,
           role: "admin",
         };
       },

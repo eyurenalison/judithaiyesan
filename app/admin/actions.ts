@@ -1,16 +1,42 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { AuthError } from "next-auth";
 import { signIn, signOut } from "@/auth";
 import { getPrisma } from "../lib/db";
+import { checkRateLimit, getClientIp } from "../lib/security";
 import { requireAdmin } from "./guard";
 
 export async function adminSignIn(formData: FormData) {
-  await signIn("credentials", {
-    email: formData.get("email"),
-    password: formData.get("password"),
-    redirectTo: "/admin",
-  });
+  const clientIp = await getClientIp();
+  const rateKey = `admin_login:${clientIp}`;
+  const rateCheck = checkRateLimit(rateKey, 5, 15 * 60 * 1000);
+
+  if (!rateCheck.allowed) {
+    return {
+      error: `Too many failed login attempts from this network. Please wait ${rateCheck.retryAfterSeconds} seconds before trying again.`,
+    };
+  }
+
+  try {
+    await signIn("credentials", {
+      email: formData.get("email"),
+      password: formData.get("password"),
+      redirectTo: "/admin",
+    });
+    return { success: true };
+  } catch (error) {
+    if (error instanceof AuthError) {
+      if (error.type === "CredentialsSignin") {
+        return {
+          error: "Invalid email or password. Please verify your credentials.",
+        };
+      }
+      return { error: "Authentication failed. Please try again." };
+    }
+    // Re-throw redirect error to allow Next.js to navigate
+    throw error;
+  }
 }
 
 export async function adminSignOut() {
@@ -301,4 +327,85 @@ export async function deleteMessage(formData: FormData) {
   const prisma = await guardedPrisma();
   await prisma.contactMessage.delete({ where: { id: text(formData, "id") } });
   revalidatePath("/admin/messages");
+}
+
+function parseIds(formData: FormData): string[] {
+  const raw = formData.get("ids");
+  if (typeof raw !== "string" || !raw.trim()) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean);
+  } catch {
+    return raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+export async function deleteMessagesBulk(formData: FormData) {
+  const prisma = await guardedPrisma();
+  const ids = parseIds(formData);
+  if (ids.length === 0) return;
+  await prisma.contactMessage.deleteMany({
+    where: { id: { in: ids } },
+  });
+  revalidatePath("/admin/messages");
+}
+
+export async function deleteAlbumsBulk(formData: FormData) {
+  const prisma = await guardedPrisma();
+  const ids = parseIds(formData);
+  if (ids.length === 0) return;
+  await prisma.album.deleteMany({
+    where: { id: { in: ids } },
+  });
+  revalidatePath("/admin/albums");
+  revalidatePath("/albums");
+  revalidatePath("/");
+}
+
+export async function deleteEventsBulk(formData: FormData) {
+  const prisma = await guardedPrisma();
+  const ids = parseIds(formData);
+  if (ids.length === 0) return;
+  await prisma.event.deleteMany({
+    where: { id: { in: ids } },
+  });
+  revalidatePath("/admin/events");
+  revalidatePath("/events");
+  revalidatePath("/");
+}
+
+export async function deleteHeroSlidesBulk(formData: FormData) {
+  const prisma = await guardedPrisma();
+  const ids = parseIds(formData);
+  if (ids.length === 0) return;
+  await prisma.heroSlide.deleteMany({
+    where: { id: { in: ids } },
+  });
+  revalidatePath("/admin/hero-slides");
+  revalidatePath("/");
+}
+
+export async function deleteMediaBulk(formData: FormData) {
+  const prisma = await guardedPrisma();
+  const ids = parseIds(formData);
+  if (ids.length === 0) return;
+  await prisma.media.deleteMany({
+    where: { id: { in: ids } },
+  });
+  revalidatePath("/admin/media");
+}
+
+export async function deleteLyricsBulk(formData: FormData) {
+  const prisma = await guardedPrisma();
+  const ids = parseIds(formData);
+  if (ids.length === 0) return;
+  await prisma.lyric.deleteMany({
+    where: { id: { in: ids } },
+  });
+  revalidatePath("/admin/lyrics");
+  revalidatePath("/lyrics");
 }

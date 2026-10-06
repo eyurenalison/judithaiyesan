@@ -1,6 +1,6 @@
+import { HomeContactForm } from "../components/home-contact-form";
 import { LyricsAccordion } from "../components/lyrics-accordion";
 import { PageHero } from "../components/page-hero";
-import { createContactMessage } from "../contact/actions";
 import { getLyrics, getSiteSettings } from "../lib/content";
 
 export default async function LyricsPage() {
@@ -47,15 +47,7 @@ export default async function LyricsPage() {
             <p>See what&apos;s new</p>
             <h2>Get In Touch</h2>
           </div>
-          <form action={createContactMessage} className="home-contact-form">
-            <input name="name" placeholder="Name" required />
-            <input name="email" placeholder="E-mail" required type="email" />
-            <input name="subject" placeholder="Subject" />
-            <textarea name="message" placeholder="Message" required rows={8} />
-            <button className="home-outline-button" type="submit">
-              Send
-            </button>
-          </form>
+          <HomeContactForm />
           <p className="home-contact-meta">
             {settings.contactEmail} · {settings.contactPhone}
           </p>

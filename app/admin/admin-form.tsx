@@ -41,11 +41,15 @@ export function AdminForm({
   return (
     <form
       action={handleSubmit}
-      className={`${className ?? ""} ${isPending ? "form-pending" : ""}`.trim()}
+      className={`admin-form-modern ${className ?? ""} ${isPending ? "is-submitting" : ""}`.trim()}
       ref={formRef}
     >
       {children}
-      {isPending ? <div className="form-pending-overlay" /> : null}
+      {isPending && (
+        <div className="admin-form-loading-bar">
+          <div className="admin-form-loading-bar-inner" />
+        </div>
+      )}
     </form>
   );
 }

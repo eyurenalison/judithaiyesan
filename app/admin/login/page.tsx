@@ -1,7 +1,7 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { PageHero } from "../../components/page-hero";
-import { adminSignIn } from "../actions";
+import { LoginForm } from "./login-form";
 
 export default async function AdminLoginPage() {
   const session = await auth();
@@ -11,42 +11,33 @@ export default async function AdminLoginPage() {
   }
 
   return (
-    <>
-      <PageHero
-        description="Sign in to manage site content and media."
-        eyebrow="Admin"
-        imageSrc="/images/bg-img/bg-2.jpg"
-        title="Admin Login"
-      />
-      <section className="page-section muted-section">
-        <div className="site-shell auth-shell">
-          <form action={adminSignIn} className="auth-form">
-            <label>
-              Email
-              <input
-                autoComplete="email"
-                name="email"
-                placeholder="admin@example.com"
-                required
-                type="email"
-              />
-            </label>
-            <label>
-              Password
-              <input
-                autoComplete="current-password"
-                name="password"
-                placeholder="Password"
-                required
-                type="password"
-              />
-            </label>
-            <button className="primary-button" type="submit">
-              Sign In
-            </button>
-          </form>
+    <div className="admin-login-fullscreen">
+      <div className="admin-login-backdrop-decor">
+        <div className="decor-circle-1" />
+        <div className="decor-circle-2" />
+      </div>
+
+      <div className="admin-login-card-container">
+        <div className="admin-login-card-header">
+          <Link className="admin-login-brand-badge" href="/">
+            <span className="brand-dot" />
+            Judith Aiyesan
+          </Link>
+          <h1 className="admin-login-heading">Admin Portal</h1>
+          <p className="admin-login-subheading">
+            Sign in with your administrator credentials to manage music, events,
+            media, and site content.
+          </p>
         </div>
-      </section>
-    </>
+
+        <LoginForm />
+
+        <div className="admin-login-card-footer">
+          <Link className="back-home-link" href="/">
+            &larr; Return to public website
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }

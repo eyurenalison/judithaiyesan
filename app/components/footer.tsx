@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { SiteSettings } from "../lib/content/types";
 
 const footerLinks = [
@@ -13,6 +16,11 @@ type FooterProps = {
 };
 
 export function Footer({ settings }: FooterProps) {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
   return (
     <footer className="site-footer">
       <div className="site-shell footer-row">

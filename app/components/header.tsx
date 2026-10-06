@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { SiteSettings } from "../lib/content/types";
 
@@ -19,6 +20,7 @@ type HeaderProps = {
 };
 
 export function Header({ settings }: HeaderProps) {
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -32,6 +34,10 @@ export function Header({ settings }: HeaderProps) {
 
     return () => window.removeEventListener("scroll", updateScrolled);
   }, []);
+
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <header

@@ -30,12 +30,13 @@ const VARIANT_ICONS: Record<ToastVariant, string> = {
   info: "ℹ",
 };
 
+const defaultToastContext: ToastContextValue = {
+  showToast: () => {},
+};
+
 export function useToast() {
   const ctx = useContext(ToastContext);
-  if (!ctx) {
-    throw new Error("useToast must be used inside <ToastProvider>");
-  }
-  return ctx;
+  return ctx ?? defaultToastContext;
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {

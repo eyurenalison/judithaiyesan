@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Footer } from "./components/footer";
 import { Header } from "./components/header";
+import { ToastProvider } from "./components/toast";
 import { getSiteSettings } from "./lib/content";
 
 export const viewport: Viewport = {
@@ -29,11 +30,13 @@ export default async function RootLayout({
   const settings = await getSiteSettings();
 
   return (
-    <html lang="en">
-      <body>
-        <Header settings={settings} />
-        <main>{children}</main>
-        <Footer settings={settings} />
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <ToastProvider>
+          <Header settings={settings} />
+          <main>{children}</main>
+          <Footer settings={settings} />
+        </ToastProvider>
       </body>
     </html>
   );

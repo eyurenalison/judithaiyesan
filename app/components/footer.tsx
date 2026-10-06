@@ -24,7 +24,7 @@ export function Footer({ settings }: FooterProps) {
   return (
     <footer className="site-footer">
       <div className="site-shell footer-row">
-        <span>
+        <span suppressHydrationWarning>
           Copyright &copy; {new Date().getFullYear()} {settings.siteName}. All
           rights reserved.
         </span>
